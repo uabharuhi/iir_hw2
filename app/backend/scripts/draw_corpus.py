@@ -1,0 +1,33 @@
+import argparse
+import os
+from inspect import getsourcefile
+import sys
+current_path = os.path.abspath(getsourcefile(lambda:0))
+current_dir = os.path.dirname(current_path)
+parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
+sys.path.insert(0, parent_dir)
+import util
+import tokenizer as tk
+import re
+
+parser = argparse.ArgumentParser()
+parser.add_argument("corpus", help="corpus name")
+args = parser.parse_args()
+
+#corpus name example pubmed/gene
+
+f = lambda _path: re.compile(r"[\\\/]").split(_path)
+
+corpus_name = args.corpus
+corpus_path = os.path.join('./data',corpus_name)
+corpus,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,tk.SpaceTokenizer())
+
+figure_dir = os.path.join('./figure',corpus_name)
+save_path = os.path.join('./figure',corpus_name,'%s.png'%(f(corpus_name)[1]))
+if  not os.path.isdir(figure_dir):
+    os.makedirs(figure_dir)
+zipf = util.save_dist_figure(corpus,corpus_name,save_path)
+
+corpus,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,tk.PorterTokenizer())
+save_path = os.path.join('./figure',corpus_name,'%s_porter.png'%(f(corpus_name)[1]))
+zipf = util.save_dist_figure(corpus,corpus_name+" porter",save_path)

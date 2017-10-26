@@ -1,6 +1,7 @@
 class Corpus():
-  def __init__(self):
+  def __init__(self,name):
     # raw_text and articles, key is filepath value is content ,,
+    self.name = name
     self.raw_texts = {}
     self.articles = {} # article , high level and encapsulation of raw_texts
 

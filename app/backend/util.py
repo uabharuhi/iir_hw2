@@ -1,7 +1,25 @@
 from collections import Counter
 import numpy as np
+
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
+import textloader as tl
+import parse
+import tokenizer as tk
+import indexer as idx
+
+
+
+def build_corpus_and_indexer(cp_name,corpus_path,tokenizer):
+    loader = tl.TextLoader()
+    corpus = loader.load_corpus_from_directory(cp_name,corpus_path)
+    factory = parse.ParserFactory()
+    corpus.parseAll(factory)
+    tokenizer = tk.SpaceTokenizer()
+    corpus.tokenizeAll(tokenizer)
+    corpus.build_vocab()
+    indexer = idx.Indexer(corpus)
+    return corpus,indexer
 
 def minEditDist(sm,sn):
   m,n = len(sm),len(sn)
@@ -14,12 +32,12 @@ def minEditDist(sm,sn):
         D[i-1][j-1] + f())
   return D[m][n] 
 
-def zip_dist_corpus(corpus,title):
+def save_dist_figure(corpus,title,save_path):
     zipf = Zipf()
     for path, article in corpus.articles.items():
         zipf.add_tokens(article.getTokens())
-    #zipf.draw_picture(title)
-    zipf.display_first_k()
+    zipf.save_dist_figure(title,save_path)
+
 
 
 def most_near_token(corpus,token,near_func=minEditDist):
@@ -38,23 +56,16 @@ class Zipf():
         c = Counter(tokens)
         self.counter+=c
 
-    def draw_picture(self,title):
-
+    def save_dist_figure(self,title,save_path):
+        #matplotlib.use('Agg')
         x = self.getDist()
         plt.plot()
-        #print(x)
         rank, freq = zip(*x)
-        #freq = (6,7,8,4,2)
-        #print(freq)        # the histogram of the data
-        #n, bins, patches = plt.hist(freq, len(freq),density=False,facecolor='blue')
         plt.xlabel('rank')
         plt.ylabel('frequency')
         plt.title(title)
         plt.plot(list(range(len(rank))),freq)
-        #plt.title(r'$\mathrm{Histogram\ of\ IQ:}\ \mu=100,\ \sigma=15$')
-        #plt.axis([40, 160, 0, 0.03])
-        #plt.grid(True)
-        plt.show()
+        plt.savefig(save_path)
 
     def display_first_k(self,k=10):
         print(self.counter.most_common(k))
