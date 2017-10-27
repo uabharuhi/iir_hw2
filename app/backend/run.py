@@ -4,9 +4,11 @@ import tokenizer as tk
 import indexer as idx
 import util
 import queryer as q
-
+import ir
 #todo spell check by not only editdistance but also term frequency
-
+def test_ir_sys():
+    ir_sys = ir.IRSystem()
+    print(ir_sys.corpus_names['pubmed'][0])
 def test_edit_distance1():
    d = util.minEditDist("the","h")
    print("edit distance:%d"%(d))
@@ -79,5 +81,5 @@ def main_test():
         #article.show()
         #print(article.getTokens())
         #break
-main_test()
+test_ir_sys()
 #test_edit_distance1()

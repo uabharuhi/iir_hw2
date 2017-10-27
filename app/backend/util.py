@@ -1,7 +1,4 @@
 from collections import Counter
-import numpy as np
-
-import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 import textloader as tl
 import parse

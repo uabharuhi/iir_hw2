@@ -1,16 +1,23 @@
 from flask import Flask
+from inspect import getsourcefile
+import sys,os
+current_path = os.path.abspath(getsourcefile(lambda:0))
+current_dir = os.path.dirname(current_path)
+parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
+sys.path.append(parent_dir)
 
-App=None
-
+App = None
+ir_sys = None
 def init_app():
-     global App
+     global App,ir_sys
      App = Flask(__name__)
      App.config['DEBUG'] = True
      App.config['SECRET_KEY'] = 'super-secret'
      App.config['TEMPLATES_AUTO_RELOAD'] = True
 
      from . import view
-
+     import backend
+     ir_sys = backend.ir_sys
      return App
 '''
      from .post import  blueprint_post

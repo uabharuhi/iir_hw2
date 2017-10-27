@@ -3,7 +3,6 @@ import os
 
 basedir = os.path.dirname(os.path.realpath(__file__))
 App = init_app()
-
 from flask_script import Manager
 
 manager = Manager(App)
