@@ -5,7 +5,7 @@ class IRSystem():
         self.corpus_names = {}
         self.get_corpus_names()
     def get_corpus_names(self):
-        root = './data'
+        root =  os.path.join(os.path.join(os.path.dirname(__file__),'data'))
         corpus_category_paths = [os.path.join(root,path) for path in os.listdir(root)]
         print(corpus_category_paths)
         corpus_names = {}

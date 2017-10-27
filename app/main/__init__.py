@@ -15,9 +15,10 @@ def init_app():
      App.config['SECRET_KEY'] = 'super-secret'
      App.config['TEMPLATES_AUTO_RELOAD'] = True
 
-     from . import view
      import backend
      ir_sys = backend.ir_sys
+     from . import view
+
      return App
 '''
      from .post import  blueprint_post

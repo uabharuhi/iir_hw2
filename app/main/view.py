@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import  url_for,redirect,render_template,flash,jsonify
-from . import App
+from . import App,ir_sys
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -13,7 +13,8 @@ def login():
 
 @App.route('/list_corpus')
 def list_corpus():
-    print(App.ir_sys)
+    print('1234')
+    print(ir_sys.corpus_names)
     return 'list corpus'
 
 @App.route('/query_system')

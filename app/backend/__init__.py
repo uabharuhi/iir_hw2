@@ -1,3 +1,2 @@
-import ir 
-#def init_backend():
+from . import ir
 ir_sys = ir.IRSystem()
