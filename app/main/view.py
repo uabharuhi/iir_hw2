@@ -2,9 +2,9 @@
 from flask import  url_for,redirect,render_template,flash,jsonify
 from . import App,ir_sys
 import os,sys,inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0,parentdir) 
+from pathlib import Path
+
+
 
 @App.route('/')
 @App.route('/index', methods=['GET'])
@@ -13,10 +13,12 @@ def login():
 
 @App.route('/list_corpus')
 def list_corpus():
-    print('1234')
-    print(ir_sys.corpus_names)
-    return 'list corpus'
+    corpus_names = {key:[os.path.basename(path) for path in l] for key,l in ir_sys.corpus_names.items()}
+    return render_template("list_corpus.html",corpus_names=corpus_names)
 
+@App.route('/dist_figure/<corpus_category>/<corpus_name>')
+def dist_figure(corpus_category,corpus_name):
+   return render_template('dist_figure.html',corpus_category=corpus_category,corpus_name=corpus_name)
 @App.route('/query_system')
 def query_system():
     return 'query_system'

@@ -22,12 +22,14 @@ corpus_name = args.corpus
 corpus_path = os.path.join('./data',corpus_name)
 corpus,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,tk.SpaceTokenizer())
 
-figure_dir = os.path.join('./figure',corpus_name)
-save_path = os.path.join('./figure',corpus_name,'%s.png'%(f(corpus_name)[1]))
+
+save_path_root = '../../main/static'
+figure_dir = os.path.join(save_path_root ,corpus_name)
+save_path = os.path.join(save_path_root ,corpus_name,'%s.png'%(f(corpus_name)[1]))
 if  not os.path.isdir(figure_dir):
     os.makedirs(figure_dir)
 zipf = util.save_dist_figure(corpus,corpus_name,save_path)
 
 corpus,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,tk.PorterTokenizer())
-save_path = os.path.join('./figure',corpus_name,'%s_porter.png'%(f(corpus_name)[1]))
+save_path = os.path.join(save_path_root ,corpus_name,'%s_porter.png'%(f(corpus_name)[1]))
 zipf = util.save_dist_figure(corpus,corpus_name+" porter",save_path)

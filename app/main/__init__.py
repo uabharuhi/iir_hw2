@@ -1,6 +1,8 @@
 from flask import Flask
 from inspect import getsourcefile
 import sys,os
+from pathlib import Path
+
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
@@ -14,7 +16,6 @@ def init_app():
      App.config['DEBUG'] = True
      App.config['SECRET_KEY'] = 'super-secret'
      App.config['TEMPLATES_AUTO_RELOAD'] = True
-
      import backend
      ir_sys = backend.ir_sys
      from . import view
