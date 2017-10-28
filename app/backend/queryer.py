@@ -1,4 +1,5 @@
 import util
+from collections import Counter
 class Queryer():
     def __init__(self,indexer):
         self.indexer  = indexer
@@ -14,15 +15,15 @@ class Queryer():
     def query_files_by_token(self,token,error_rate=0.2,flag_spell_check=True):
         if flag_spell_check:
             tolerance = max(int(len(token)*error_rate),1)
-            token = self.spell_check(token, tolerance)
+            tokens = self.spell_check(token, tolerance)
 
-        if token is None:
+        if tokens is None:
             return []
         print('ya .....')
-        print(token)
-        files = self.indexer.search_files_by_index(token)
+        print(tokens)
+        files = self.indexer.search_files_by_index(tokens)
 
-        return files
+        return files,tokens
 
 
     def get_spellchecked_tokens(self,sentence,tokenizer,error_rate=0.2):
@@ -38,4 +39,23 @@ class Queryer():
 
 
 
+    def count_matches(self,tokens):
+        corpus = self.indexer.corpus
+        articles = corpus.articles
+        match_times = {} # key is article tilte  , value is match times
+        match_detail  = {} # key is token name , value is  {tiltle:tolen_math_times in article with title}
+
+        for article in articles:
+            match_times[article.title] = 0
+
+        for token in list(set(tokens)):
+            detail_dict = {}
+            match_detail[token] = detail_dict
+            for article in articles:
+                counter =  Counter( article.getTokens())
+                occur_times = counter[token]
+                detail_dict[article.title] = occur_times
+                match_times[article.title]+= occur_times
+
+        return match_detail,match_times
 

@@ -4,8 +4,13 @@ import textloader as tl
 import parse
 import tokenizer as tk
 import indexer as idx
-
-
+import  ir
+def test_ir_system():
+    ir_sys = ir.IRSystem()
+    corpusname, match_total, token_matchtimes = ir.make_query("i have a pen",3)
+    print(corpusname)
+    print(match_total)
+    print(token_matchtimes)
 
 def build_corpus_and_indexer(cp_name,corpus_path,tokenizer):
     loader = tl.TextLoader()
@@ -72,3 +77,4 @@ class Zipf():
     #     c = Counter(tokens)
     #     return c.most_common()
 
+test_ir_system()
