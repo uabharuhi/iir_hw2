@@ -12,7 +12,6 @@ def build_corpus_and_indexer(cp_name,corpus_path,tokenizer):
     corpus = loader.load_corpus_from_directory(cp_name,corpus_path)
     factory = parse.ParserFactory()
     corpus.parseAll(factory)
-    tokenizer = tk.SpaceTokenizer()
     corpus.tokenizeAll(tokenizer)
     corpus.build_vocab()
     indexer = idx.Indexer(corpus)
@@ -63,7 +62,7 @@ class Zipf():
         plt.title(title)
         plt.plot(list(range(len(rank))),freq)
         plt.savefig(save_path)
-
+        print(self.display_first_k(10))
     def display_first_k(self,k=10):
         print(self.counter.most_common(k))
 
