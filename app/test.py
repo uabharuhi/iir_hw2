@@ -1,11 +1,35 @@
-import textloader as tl
-import parse
-import tokenizer as tk
-import indexer as idx
-import util
-import queryer as q
-import ir
+from backend import textloader as tl
+from backend import parse
+from backend import tokenizer as tk
+from backend import indexer as idx
+from backend import util
+from backend import queryer as q
+#from backend import ir
 #todo spell check by not only editdistance but also term frequency
+
+
+def test_part_group():
+    from backend import article as a
+    article = a.PubMedArticle()
+    article.setTitle("i don't want to do any ... !dog  pen!")
+    article.add_abstract_text("a pen-pen  pen is a #dog")
+    article.add_abstract_text("i have a \n pen")
+    article.tokenize(tk.SpaceTokenizer())
+    tokens = ["i","have","a","dog","pen"]
+    title_group,abstract_group = util.find_token_pos_in_pubmed_article(tokens, article)
+
+    print(title_group)
+    print(abstract_group)
+
+
+def test_ir_sys2():
+    ir_sys = ir.IRSystem()
+    corpusname, match_total, token_matchtimes,tokens = ir_sys.make_query("i have a pen gene",3)
+    print(corpusname)
+    print(match_total)
+    print(token_matchtimes)
+
+
 def test_ir_sys():
     ir_sys = ir.IRSystem()
     print(ir_sys.corpus_names['pubmed'][0])
@@ -36,17 +60,18 @@ def test_query_sentence(tokenizer,indexer):
         print("found %d results:"%(len(l)))
         print(l)
     queryer = q.Queryer(indexer)
-    l = queryer.query_files_by_sentence("i have a pen",tokenizer,0.2,False)
+    l = queryer.query_files_by_sentence("i have a pen",tokenizer,0.2,False)[0]
     print_res(l)
-    l2 = list(set(queryer.query_files_by_token("i",0.2,False)+queryer.query_files_by_token("have",0.2,False)
-    +queryer.query_files_by_token("a",0.2,False)+queryer.query_files_by_token("pen",0.2,False)))
+    l2 = list(
+        set(queryer.query_files_by_token("i",0.2,False)[0]+queryer.query_files_by_token("have",0.2,False)[0]
+    +queryer.query_files_by_token("a",0.2,False)[0]+queryer.query_files_by_token("pen",0.2,False)[0]))
     print(len(l))
     print(len(l2))
     #沒sort會不一樣
     assert sorted(l)==sorted(l2)
 
     print('------ spell check')
-    print_res(queryer.query_files_by_token("gne",1,True))
+    print_res(queryer.query_files_by_token("gne",1,True)[0])
     #query_files_by_sentence
 #def test_query_token(token,error_rate,flag_spell_check=True))
 #    query_token(self,token,error_rate,flag_spell_check=True):
@@ -57,7 +82,8 @@ def test_query_sentence(tokenizer,indexer):
 
 def main_test():
     loader = tl.TextLoader()
-    corpus = loader.load_corpus_from_directory('./data/pubmed/gene')
+    print('main test')
+    corpus = loader.load_corpus_from_directory('foo','./backend/data/pubmed/gene')
     factory = parse.ParserFactory()
     corpus.parseAll(factory)
     #articles = corpus.articles
@@ -74,12 +100,15 @@ def main_test():
     #test_query_sentence(tokenizer,indexer)
     #queryer = q.Queryer(indexer)
     #print(queryer.get_spellchecked_tokens("gane is pretein",tokenizer,error_rate=0.6))
-    files = indexer.search_files_by_index('the')
-    print(len(files))
+    test_query_sentence(tokenizer,indexer)
+    #files = indexer.search_files_by_index('the')
+    #print(len(files))
     #for p,article in articles.items():
         #print('1')
         #article.show()
         #print(article.getTokens())
         #break
-test_ir_sys()
+
+test_part_group()
+#test_ir_sys()
 #test_edit_distance1()

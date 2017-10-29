@@ -1,7 +1,7 @@
 import os
-import util
-import tokenizer as tk
-import  queryer as q
+from  backend import util
+from  backend  import tokenizer as tk
+from  backend import  queryer as q
 from  collections import Counter
 
 class IRSystem():
@@ -36,10 +36,13 @@ class IRSystem():
 
     def initilize_queryer(self):
         #corpus_paths = [ os.path.join(root,corpus_name)   for corpus_name in self.corpus_names]
-        for corpus_name in self.corpus_names:
-            corpus_path =   os.path.join(self.root,corpus_name)
-            _,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,self.tokenizer)
-            self.queryers[corpus_name] = q.Queryer(indexer)
+        for cat,corpus_names in self.corpus_names.items():
+            for corpus_name in corpus_names:
+                corpus_path =   os.path.join(self.root,corpus_name)
+                _,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,self.tokenizer)
+                self.queryers[corpus_name] = q.Queryer(indexer)
+
+
 
 
     def make_query(self,query,top_k=10):
@@ -47,38 +50,41 @@ class IRSystem():
         article_corpusname  = {}
         article_match_total = {}
         article_token_matchtimes ={}
-
+        occur_pos = {} #key is  token ,value is the pos occur in the origin text
         import queue
         q = queue.PriorityQueue()
-        for corpus_name,queryer in self.queryers.itmes():
-            files, tokens = queryer.query_files_by_sentence(query, self.tokenizer, error_rate=0.6, flag_spell_check=True)
-            articles =  [queryer.corpus.articles[path] for path in files]
+        for corpus_name,queryer in self.queryers.items():
+            files, tokens = queryer.query_files_by_sentence(query, self.tokenizer, error_rate=0.0, flag_spell_check=False)
+            articles =  [queryer.indexer.corpus.articles[path] for path in files]
             for article in articles:
                 match_times,match_details = self.count_matches_in_article(article,tokens)
-                article_match_total[article.title] = match_times
-                article_corpusname[article.title] = corpus_name
-                article_token_matchtimes[article.title] = match_details
-                q.put((-1*match_times,article.title),False)
-
+                article_match_total[article.getTitle()] = match_times
+                article_corpusname[article.getTitle()] = corpus_name
+                article_token_matchtimes[article.getTitle()] = match_details
+                q.put((-1*match_times,article.getTitle()),False)
         ret_article_titles =[]
         ret_num = min(top_k,q.qsize())
         for i in range(ret_num):
-            ret_article_titles.append(q.get(False)[1])
+            title = q.get(False)[1]
+            ret_article_titles.append(title)
+        print(ret_article_titles)
 
         k_article_corpusname ={ k:v for k,v in article_corpusname.items() if k in ret_article_titles}
         k_article_match_total = {k: v for k, v in article_match_total.items() if k in ret_article_titles}
         k_article_token_matchtimes = {k: v for k, v in article_token_matchtimes.items() if k in ret_article_titles}
 
-        return  article_corpusname,article_match_total, article_token_matchtimes
+        return  k_article_corpusname,k_article_match_total, k_article_token_matchtimes,tokens
+
+
 
     def count_matches_in_article(self, article, tokens):
         match_times = 0
         match_detail = {}
-
         for token in list(set(tokens)):
+            #print(token)
             counter = Counter(article.getTokens())
             occur_times = counter[token]
-            match_detail[article.title] = occur_times
+            match_detail[token] = occur_times
             match_times += occur_times
 
         return match_times,match_detail

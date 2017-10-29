@@ -21,3 +21,4 @@ class PorterTokenizer():
         tokens =  [stemmer.stem(token) for token in  tokens]
         return tokens
 
+

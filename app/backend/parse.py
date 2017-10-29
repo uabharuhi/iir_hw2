@@ -1,4 +1,4 @@
-from article import PubMedArticle,TwitterArticle
+from backend.article import PubMedArticle,TwitterArticle
 import json
 class ParserFactory():
   def __init__(self):

@@ -1,16 +1,50 @@
 from collections import Counter
 import matplotlib.pyplot as plt
-import textloader as tl
-import parse
-import tokenizer as tk
-import indexer as idx
-import  ir
-def test_ir_system():
-    ir_sys = ir.IRSystem()
-    corpusname, match_total, token_matchtimes = ir.make_query("i have a pen",3)
-    print(corpusname)
-    print(match_total)
-    print(token_matchtimes)
+from  backend import textloader as tl
+from  backend  import parse
+from  backend import tokenizer as tk
+from  backend  import indexer as idx
+from  backend  import  ir
+import re
+#一篇文章先用part 隔開 一個part是一堆垃圾或是token隔開後每一個字都給一個index
+#
+#pos就是那些被認為和token同樣的word的index
+#可能出現在titile或文章內
+
+
+#返回  1 一堆tilte part組成的 list, 2 list of list of part in abstract_texts
+#          2  標記: 每一個part的標記 -1代表不是token 1代表這個part是token 1 ...
+def find_token_pos_in_pubmed_article(tokens,article):
+    pat = re.compile(r'([0-9a-zA-Z\-]+)|([^0-9^a-z^A-Z^\-]+)')
+
+    title = article.getTitle()
+    abstract_texts = article.abstract_text
+    abstract_parts_group = []
+
+    for abstract  in abstract_texts:
+        part_group = find_partgroup_in_string(pat,abstract,tokens,article.tokenizer)
+        abstract_parts_group.append(part_group)
+
+    title_parts_group = find_partgroup_in_string(pat,title,tokens,article.tokenizer)
+
+    return title_parts_group,abstract_parts_group
+
+def find_partgroup_in_string(pat,s,tokens,tokenizer):
+    part_group = []
+    for m in re.finditer(pat,s):
+        if m.group(1) is not None:
+            _l = tokenizer.tokenize(m.group(1)) #check the group after tokenizer is the sane as token
+            assert len(_l)==1
+            token_number = -1
+            for i,token in enumerate(tokens):
+                if token == _l[0]:
+                    token_number = i
+                    break
+            part_group.append((token_number, m.group(1)))
+        else :
+            assert m.group(2) is not None
+            part_group.append((-1,m.group(2)))
+    return part_group
 
 def build_corpus_and_indexer(cp_name,corpus_path,tokenizer):
     loader = tl.TextLoader()
@@ -76,5 +110,3 @@ class Zipf():
     # def token_histogram(tokens):
     #     c = Counter(tokens)
     #     return c.most_common()
-
-test_ir_system()
