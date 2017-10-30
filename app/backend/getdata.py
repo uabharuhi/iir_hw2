@@ -6,7 +6,7 @@ def search(query):
     Entrez.email = 'your.email@example.com'
     handle = Entrez.esearch(db='pubmed',
                             sort='relevance',
-                            retmax='100',
+                            retmax='2000',
                             retmode='xml',
                             term=query)
     results = Entrez.read(handle)
@@ -25,7 +25,7 @@ def fetch_details(id_list):
     return results
 
 if __name__ == '__main__':
-    results = search('mutation')
+    results = search('gene')
     id_list = results['IdList']
     papers = fetch_details(id_list)
     for i, paper in enumerate(papers['PubmedArticle']):

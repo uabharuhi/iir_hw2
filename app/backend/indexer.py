@@ -7,7 +7,15 @@ class Indexer():
         self.index_dict = {}
         l = list(self.corpus.vocab)
         for  token in l:
-            self.index_dict[token] = [path for path,article in self.corpus.articles.items() if token in article.getTokens()]
+            self.index_dict[token] = []
+            paths  = [(path,articles) for path,articles in self.corpus.articles.items()]
+            for path,articles in paths:
+                if type(articles) is  list:
+                    for article in articles:
+                        self.index_dict[token].append(path)
+                else:
+                    self.index_dict[token].append(path)
+
         # for token in list(self.index_dict.keys())[0:10]:
         #     print('token')
         #     print(token)

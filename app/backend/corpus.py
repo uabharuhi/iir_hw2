@@ -16,18 +16,52 @@ class Corpus():
       filetype = uppath(path,3)
       func = parserFactory.createParseFunction(filetype)
       #print(text)
-      article = func(text)
-      self.articles[path] = article
+      #print(path)
+      if 'twitter' == filetype:
+        articles =  func(text)
+        self.articles[path] = articles
+      elif 'pubmed' == filetype:
+       article = func(text)
+       self.articles[path] = article
+      else:
+        assert  False
+  # pat
+  # def operate_on_article(self,path,func):
+  #   if type(self.articles[path]) is list:  # twitter file
+  #     for article in self.articles[path]:
+  #       func(article)
+  #   else:
+  #     func(self.articles[path])
 
+
+  def getArticlesByPaths(self,files) :
+    l = []
+    for path in files:
+      if type(self.articles[path]) is list: # twitter file
+        for article in self.articles[path]:
+          l.append(article)
+      else:
+        l.append(self.articles[path])
+    return l
 
   def tokenizeAll(self,tokenizer):
-    for path,article in self.articles.items():
-      article.tokenize(tokenizer)
+    for path in self.articles:
+      if type(self.articles[path]) is list: # twitter file
+        for article in self.articles[path]:
+          article.tokenize(tokenizer)
+      else:
+        self.articles[path].tokenize(tokenizer)
+
 
   def build_vocab(self):
       self.vocab = set()
-      for path, article in self.articles.items():
-        self.vocab = self.vocab |set(article.getTokens())
+      for path in self.articles:
+        if type(self.articles[path]) is list:  # twitter file
+          for article in self.articles[path]:
+            self.vocab = self.vocab | set(article.getTokens())
+        else:
+          self.vocab = self.vocab | set(self.articles[path].getTokens())
+
 
 
 

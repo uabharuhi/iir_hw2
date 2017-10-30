@@ -5,15 +5,20 @@ from  backend import  queryer as q
 from  collections import Counter
 
 class IRSystem():
-    def __init__(self):
+    def __init__(self,init_queryer=True):
         self.corpus_list = []
         self.corpus_names = {} # key is category ,value is name
         self.queryers = {}  # key is corpus name ,value is queryer
         self.tokenizer = tk.SpaceTokenizer()
         self.root = os.path.join(os.path.join(os.path.dirname(__file__), 'data'))
+        self.all_vocab = set()
 
         self.create_corpus_names()
-        self.initilize_queryer()
+        if init_queryer:
+            self.initilize_queryer()
+
+
+
 
 
     def create_corpus_names(self):
@@ -39,23 +44,33 @@ class IRSystem():
         for cat,corpus_names in self.corpus_names.items():
             for corpus_name in corpus_names:
                 corpus_path =   os.path.join(self.root,corpus_name)
-                _,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,self.tokenizer)
+                corpus,indexer = util.build_corpus_and_indexer(corpus_name,corpus_path,self.tokenizer)
                 self.queryers[corpus_name] = q.Queryer(indexer)
+                self.all_vocab  =  self.all_vocab | corpus.vocab
 
+    def all_in_vocab_set(self,tokens):
+        for token in tokens:
+            if token not in self.all_vocab:
+                return  False
+        return True
 
-
+    def alternative_query(self,query,tokenizer):
+        tokens  = tokenizer.tokenize(query)
+        alternative_tokens = [util.most_near_token_in_vocab(self.all_vocab, token)[0] for token in tokens]
+        return  alternative_tokens
 
     def make_query(self,query,top_k=10):
 
         article_corpusname  = {}
         article_match_total = {}
         article_token_matchtimes ={}
-        occur_pos = {} #key is  token ,value is the pos occur in the origin text
+      
         import queue
         q = queue.PriorityQueue()
+
         for corpus_name,queryer in self.queryers.items():
             files, tokens = queryer.query_files_by_sentence(query, self.tokenizer, error_rate=0.0, flag_spell_check=False)
-            articles =  [queryer.indexer.corpus.articles[path] for path in files]
+            articles = queryer.indexer.corpus.getArticlesByPaths(files)
             for article in articles:
                 match_times,match_details = self.count_matches_in_article(article,tokens)
                 article_match_total[article.getTitle()] = match_times
@@ -65,7 +80,9 @@ class IRSystem():
         ret_article_titles =[]
         ret_num = min(top_k,q.qsize())
         for i in range(ret_num):
-            title = q.get(False)[1]
+            occur,title = q.get(False)
+            print('queue')
+            print((occur,title))
             ret_article_titles.append(title)
         print(ret_article_titles)
 
@@ -73,7 +90,7 @@ class IRSystem():
         k_article_match_total = {k: v for k, v in article_match_total.items() if k in ret_article_titles}
         k_article_token_matchtimes = {k: v for k, v in article_token_matchtimes.items() if k in ret_article_titles}
 
-        return  k_article_corpusname,k_article_match_total, k_article_token_matchtimes,tokens
+        return  ret_article_titles,k_article_corpusname,k_article_match_total, k_article_token_matchtimes,tokens
 
 
 

@@ -1,6 +1,7 @@
 from flask import Flask
 from inspect import getsourcefile
 import sys,os
+from flask_bootstrap import Bootstrap
 from pathlib import Path
 
 current_path = os.path.abspath(getsourcefile(lambda:0))
@@ -17,9 +18,10 @@ def init_app():
      App.config['SECRET_KEY'] = 'super-secret'
      App.config['TEMPLATES_AUTO_RELOAD'] = True
      import backend
-     ir_sys = backend.ir_sys
+     #ir_sys = backend.init_ir_system()
      from . import view
 
+     Bootstrap(App)
      return App
 '''
      from .post import  blueprint_post

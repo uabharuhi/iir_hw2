@@ -29,6 +29,11 @@ def find_token_pos_in_pubmed_article(tokens,article):
 
     return title_parts_group,abstract_parts_group
 
+def find_token_pos_in_twitter_article(tokens, article):
+    pat = re.compile(r'([0-9a-zA-Z\-]+)|([^0-9^a-z^A-Z^\-]+)')
+    text_part_group = find_partgroup_in_string(pat,article.text,tokens,article.tokenizer)
+    return  text_part_group
+
 def find_partgroup_in_string(pat,s,tokens,tokenizer):
     part_group = []
     for m in re.finditer(pat,s):
@@ -69,8 +74,12 @@ def minEditDist(sm,sn):
 
 def save_dist_figure(corpus,title,save_path):
     zipf = Zipf()
-    for path, article in corpus.articles.items():
-        zipf.add_tokens(article.getTokens())
+    for path, articles in corpus.articles.items():
+        if type(articles) is list:
+            for a in articles:
+                zipf.add_tokens(a.getTokens())
+        else :
+            zipf.add_tokens(articles.getTokens())
     zipf.save_dist_figure(title,save_path)
 
 
@@ -80,8 +89,11 @@ def most_near_token(corpus,token,near_func=minEditDist):
     token_dist = [ (vocab_token,near_func(vocab_token, token)) for vocab_token in vocab]
     token_dist = sorted(token_dist, key=lambda x: (x[1]))
     return token_dist[0]
-
-
+#return   tuple(token,distance)
+def most_near_token_in_vocab(vocab,token,near_func=minEditDist):
+    token_dist = [ (vocab_token,near_func(vocab_token, token)) for vocab_token in vocab]
+    token_dist = sorted(token_dist, key=lambda x: (x[1]))
+    return token_dist[0]
 
 class Zipf():
     def __init__(self):
@@ -96,12 +108,14 @@ class Zipf():
         x = self.getDist()
         plt.plot()
         rank, freq = zip(*x)
+        #print(rank[-1:-1-20:-1])
         plt.xlabel('rank')
         plt.ylabel('frequency')
         plt.title(title)
         plt.plot(list(range(len(rank))),freq)
         plt.savefig(save_path)
-        print(self.display_first_k(10))
+        plt.close()
+        self.display_first_k(10)
     def display_first_k(self,k=10):
         print(self.counter.most_common(k))
 

@@ -39,18 +39,35 @@ class PubMedArticle():
 
 class TwitterArticle():
   def __init__(self):
+    self.username =""
+    self.date = ""
     self.text = ""
+    self.tokens = []
+    self.tokenizer = None
+
+  def init_by_json(self,json_obj):
+    self.username = json_obj['username']
+    self.text = json_obj['text']
+    self.date = json_obj['date']
+    #self.remove_url()
 
   def getType(self):
     return 'twitter'
 
-  def setText(self,text):
-    self.text = text
   def remove_url(self):
     pass
-  def tokenize(self,tokenizer):
-    pass
-  def getTitle(self):
-    return ""
+    # import re
+    # pat = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    # selfself.text.replace()
+
+  def tokenize (self,tokenizer):
+
+    self.tokenizer = tokenizer
+    self.tokens = tokenizer.tokenize(self.text)
+
+
+  def getTitle(self): #for display on web
+    return self.username+" "+self.date.replace('/','-')
+
   def getTokens(self):
-    return ['1']
+    return self.tokens

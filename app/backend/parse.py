@@ -6,12 +6,24 @@ class ParserFactory():
 
   def createParseFunction(self,filetype):
     def parseTwitter(text):
-      article = TwitterArticle()
+      articles = []
+      l = json.loads(text)
+      for article_json in l:
+        article = TwitterArticle()
+        article.init_by_json(article_json)
+        articles.append(article)
+      return articles
 
-      return article
     def parsePubmedJson(text):
+
       article = PubMedArticle()
-      obj = json.loads(text, encoding="utf-8")
+      try:
+        obj = json.loads(text, encoding="utf-8")
+      except :
+        article.setTitle('')
+        article.add_abstract_text('')
+        return article
+        
       article.setTitle(obj['title'])
       for text in obj['texts']:
         article.add_abstract_text(text)
