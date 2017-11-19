@@ -4,3 +4,4 @@ app/backend/*.pyc
 app/temp/*
 app/*.png
 app/*.jpg
+bfg.jar
