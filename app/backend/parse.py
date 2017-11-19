@@ -16,13 +16,11 @@ class ParserFactory():
 
     def parsePubmedJson(text):
 
-      article = PubMedArticle()
+      article = PubMedArticle('') # dummy path first
       try:
         obj = json.loads(text, encoding="utf-8")
       except :
-        article.setTitle('')
-        article.add_abstract_text('')
-        return article
+        return None
         
       article.setTitle(obj['title'])
       for text in obj['texts']:

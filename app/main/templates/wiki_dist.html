@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<style>
+.wf-table_wrapper{
+	width:50%;
+}
+.wf-table_wrapper> div{
+	margin-top:50px;
+}
+.wf-table_wrapper table{
+	margin-top:50px;
+}
+</style>
+<script>
+	$(document).ready(function(){
+     	$('#show_text').on('click',function()
+		{
+			$('#text').toggle();
+			if($(this).text()=='show'){
+			    $(this).text('hide');
+			}else{
+			    $(this).text('show');
+			}
+		})
+		$('#text').hide();
+    });
+</script>
+{% endblock %}
+{%block real_content %}
+            <h1>Distributions of {{topic}}</h1>
+			<button id="show_text" class="btn btn-primary">show</button>
+			<div id="text">
+			{{text}}
+			</div>
+            <div class="wf-table_wrapper">
+                <div>
+                    <img src="{{url_for('static',filename='wiki/%s.png'%(topic))}}"/>
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>top words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in tops%}
+										 <tr><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>rare words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in downs%}
+										 <tr><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>#</th><th>sample words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in randoms%}
+										 <tr><td><strong>{{random_idxs[loop.index-1]}}</strong></td><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+
+                </div>
+            </div>
+{%endblock%}
+
+

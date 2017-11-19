@@ -7,6 +7,15 @@ from backend import queryer as q
 #from backend import ir
 #todo spell check by not only editdistance but also term frequency
 
+#example test_top_n_rel('pubmed\\gene')
+def test_top_n_rel(full_corpus_name):
+    import _pickle as pickle
+    print('loading corpus...')
+    with open("./temp/corpus.pkl", mode='rb') as f:
+        corpus_list = pickle.load(f)
+    print('loading end .....')
+    corpus = [corpus for corpus in corpus_list if full_corpus_name==corpus.name][0]
+    util.top_n_relevant_articles(corpus, 10)
 
 def test_part_group():
     from backend import article as a
@@ -24,7 +33,7 @@ def test_part_group():
 
 def test_ir_sys2():
     ir_sys = ir.IRSystem()
-    corpusname, match_total, token_matchtimes,tokens = ir_sys.make_query("i have a pen gene",3)
+    corpusname, _,match_total, token_matchtimes,tokens = ir_sys.make_query("i have a pen gene",3)
     print(corpusname)
     print(match_total)
     print(token_matchtimes)
@@ -109,6 +118,6 @@ def main_test():
         #print(article.getTokens())
         #break
 
-test_part_group()
+test_top_n_rel('twitter\\zika')
 #test_ir_sys()
 #test_edit_distance1()

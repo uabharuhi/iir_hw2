@@ -19,10 +19,13 @@ class Corpus():
       #print(path)
       if 'twitter' == filetype:
         articles =  func(text)
-        self.articles[path] = articles
+        if  articles is not None:
+          self.articles[path] = articles
       elif 'pubmed' == filetype:
-       article = func(text)
-       self.articles[path] = article
+        articles = func(text)
+        if articles is not None:
+          articles.setPath(path)
+          self.articles[path] = articles
       else:
         assert  False
   # pat

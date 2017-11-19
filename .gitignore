@@ -1,1 +1,6 @@
-app/data/*
+app/backend/data/*
+app/backend/backup/*
+app/backend/*.pyc
+app/temp/*
+app/*.png
+app/*.jpg

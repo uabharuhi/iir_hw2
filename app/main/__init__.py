@@ -11,19 +11,21 @@ sys.path.append(parent_dir)
 
 App = None
 ir_sys = None
+ir_sys_porter = None
 def init_app():
-     global App,ir_sys
-     App = Flask(__name__)
-     App.config['DEBUG'] = True
-     App.config['SECRET_KEY'] = 'super-secret'
-     App.config['TEMPLATES_AUTO_RELOAD'] = True
-     import backend
-     #ir_sys = backend.init_ir_system()
-     from . import view
+    global App,ir_sys, ir_sys_porter
+    App = Flask(__name__)
+    App.config['DEBUG'] = True
+    App.config['SECRET_KEY'] = 'super-secret'
+    App.config['TEMPLATES_AUTO_RELOAD'] = True
+    import backend
+    ir_sys = backend.init_ir_system('normal')
+    ir_sys_porter  = backend.init_ir_system('porter')
+    from . import view
 
-     Bootstrap(App)
-     return App
-'''
+    Bootstrap(App)
+    return App
+    '''
      from .post import  blueprint_post
      App.register_blueprint(blueprint_post)
 
