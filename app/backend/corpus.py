@@ -4,6 +4,7 @@ class Corpus():
     self.name = name
     self.raw_texts = {}
     self.articles = {} # article , high level and encapsulation of raw_texts
+    self.vocab = None
 
   def add_raw_text(self,path,text):
     #print("adding %s ..."%(path))

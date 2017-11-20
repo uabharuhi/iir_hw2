@@ -246,3 +246,15 @@ def create_corpus_names():
     corpus_names = corpus_names
     return corpus_names
 
+#get id2token and token2id
+# input :
+#     vocab: list of token
+def getLookupTables(vocab_list):
+    id2token = []
+    token2id = {}
+    for  i,token in enumerate(vocab_list):
+        if token not in token2id:
+            n = len(token2id)
+            token2id[token] = n
+            id2token.append(token)
+    return id2token,token2id

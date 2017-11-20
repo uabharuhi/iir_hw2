@@ -5,4 +5,5 @@
 /app/*.png
 /app/*.jpg
 /bfg.jar
-/.*
+/.
+/*.pyc

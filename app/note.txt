@@ -1,0 +1,7 @@
+python尋找module順序
+1. build in
+2. 執行第一個script的directory
+3. PYTHONPATH環境變數
+4. 自己裝的library
+
+set PYTHONPATH=C:\Users\IIR\Desktop\一上\IR\hw2\app

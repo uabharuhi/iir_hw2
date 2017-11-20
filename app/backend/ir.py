@@ -18,14 +18,6 @@ class IRSystem():
             self.initialize_queryer()
 
 
-   # def dump_indexer_corpus(self,tk_type):
-
-
-
-
-
-   #build_corpus_and_indexer(cp_name, corpus_path, tokenizer):
-
     def initialize_queryer(self,load_from_pkl=False):
         #corpus_paths = [ os.path.join(root,corpus_name)   for corpus_name in self.corpus_names]
         for cat,corpus_names in self.corpus_names.items():
@@ -71,8 +63,7 @@ class IRSystem():
                     content = article.abstract_text[0]
                 elif article.getType()=='twitter':
                     content = article.text
-                #if len(content)==0:
-                    #print(article.getTitle())
+               
                 q.put((-1*match_times,article.getTitle(),content),False)
                 
         ret_article_info =[]
@@ -102,7 +93,7 @@ class IRSystem():
         match_times = 0
         match_detail = {}
         for token in list(set(tokens)):
-            #print(token)
+            
             counter = Counter(article.getTokens())
             occur_times = counter[token]
             match_detail[token] = occur_times
