@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block head %}
+  {{super()}}
+<style>
+  .row {
+    margin-top:20px;
+  }
+</style>
+{%endblock%}
+{%block real_content %}
+
+      <div class="row">
+        <div class="col-lg-6 portfolio-item">
+          <div class="card h-100">
+
+            <div class="card-body">
+              <h4 class="card-title">
+                <a href="{{url_for('list_corpus')}}">Corpus Statistics</a>
+              </h4>
+                <p class="card-text "><p class="m-font-size">List all corpus avaliable.</p> <p  class="m-font-size">Display term frequency distribution using  Porter's algorithm  or without Porter's algorithm</p></p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 portfolio-item">
+          <div class="card h-100">
+
+            <div class="card-body">
+              <h4 class="card-title">
+                <a href="{{url_for('query_system')}}">Make A Query</a>
+              </h4>
+                <p class="card-text">
+                <p class="m-font-size">Make a query to search all relevant article in corpus</p>
+                </p>
+
+            </div>
+            </div>
+          </div>
+        </div>
+      <div class="row">
+            <div class="col-lg-6 portfolio-item">
+              <div class="card h-100">
+
+                <div class="card-body">
+                  <h4 class="card-title">
+                    <a href="{{url_for('wiki')}}">Wiki Statistics</a>
+                  </h4>
+                    <p class="card-text "><p class="m-font-size">Show the term distribution under a Wiki topic</p></p>
+                </div>
+              </div>
+            </div>
+
+      </div>
+{% endblock %}

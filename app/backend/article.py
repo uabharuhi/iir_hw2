@@ -46,6 +46,12 @@ class PubMedArticle():
       print('- '*50)
     print(self.abstract_text)
 
+  def isEmpty(self):
+    for text in  self.abstract_text:
+      if len(text)>0:
+        return False
+    return True
+
 
 class TwitterArticle():
   def __init__(self):
@@ -97,3 +103,6 @@ class TwitterArticle():
 
   def __lt__(self, other):
     return len(self.text)<len(other.text)
+
+  def isEmpty(self):
+    return len(self.text)==0

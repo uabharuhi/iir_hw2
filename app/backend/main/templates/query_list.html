@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<style>
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<style>
+#main{
+    width:70%;
+}
+#query{
+    width:40%;
+    margin-right: 20px;
+}
+#k_num{
+    margin-right: 20px;
+}
+.query_results{
+    margin-top:40px;
+}
+#query_form select{
+	margin-right: 20px;
+}
+#query_results ul{
+        -webkit-padding-start: 0px;
+}
+.rel_article_tile{
+    padding:10px 10px 10px 10px;
+    background:gray;
+    color:white;
+}
+.rel_article_info{
+     padding:20px 10px 20px 10px;
+}
+.token{
+    color:#16181b;
+    margin-right:5px;
+}
+.div_article{
+    margin-bottom:50px;
+    box-shadow: 2px 2px 10px  #888888;
+}
+.my-badge{
+    font-size:20px;
+}
+.content_preview{
+    font-size:20px;
+    padding:20px 10px 20px 10px;
+}
+#content_area{
+    min-height:500px;
+}
+#page_idx_div{
+	display:none;
+}
+</style>
+<!--這裡的分頁是建立在form上面的像是k_num不變的情況下-->
+<script>
+   $(document).ready(function(){
+        appendPleaseWait();
+        $('#alter').on('click',function(e){
+            console.log('1234');
+            $('#query').val($(this).text());
+            //$('#query_form').submit();
+			$('.submit_btn').click();
+			$
+        }
+        );
+       $('.submit_btn').on('click',function(){
+            showPleaseWait();
+	    });
+		$('.page-link').on('click',function()
+		{
+			console.log('1234');
+			$('#page_idx_div input').val($(this).data('page_idx'));
+			$('.submit_btn').click();
+		});
+    });
+
+</script>
+{% endblock %}
+{%block real_content %}
+<div id="main">
+            <div id="content_area">
+            <h1>Make A Query</h1>
+            <br/>
+            <form id="query_form" class="form-inline" action="{{url_for('query')}}" method="post" role="form">
+                <!--shttps://stackoverflow.com/questions/21511234/how-to-submit-a-form-on-a-link-click-using-jquery-->
+								<div id="page_idx_div">
+								<input name="page_idx" value="{{1}}"></input>
+								</div>
+								{% if query is defined %}
+                                <input id="query"  class="form-control" type="text" name="query" placeholder="   your query" value="{{query}}" />
+								{%else%}
+								 <input id="query"  class="form-control" type="text" name="query" placeholder="   your query" />
+								{%endif%}
+								
+								{% if top_k_num is defined %}
+                                <input id="k_num"  class="form-control" type="text" name="top_k_num" placeholder="article number" value="{{top_k_num}}"/>
+								{%else%}
+								<input id="k_num"  class="form-control" type="text" name="top_k_num" placeholder="article number" />
+								{%endif%}
+								
+								{% if token_algorithm is defined %}
+								<select name="token_algorithm" class="custom-select">
+									{%if token_algorithm=='normal'%}
+                                    <option value="normal" selected="selected">Normal</option>
+                                    {%else%}
+                                    <option value="normal">Normal</option>
+									{%endif%}
+
+                                    {%if token_algorithm=='porter'%}
+									<option value="porter" selected="selected">Porter</option>
+                                    {%else%}
+                                    <option value="porter">Porter</option>
+                                    {%endif%}
+								</select>
+								{%else%}
+								<select name="token_algorithm" class="custom-select">
+									<option value="normal">Normal</option>
+									<option value="porter">Porter</option>
+								</select>
+								{%endif%}
+								
+               <button type="submit" class="btn btn-primary submit_btn">Submit</button>
+            </form>
+			<div>
+				<a href="#">Search option</a> 
+			</div>
+            <div id="token_div">
+                {%if alternaive_query|length >0 %}
+                <strong>do you want to search</strong>
+                <a id="alter" href="#">{{alternaive_query}}</a> ?
+                {%endif%}
+            </div>
+            {%if list_result_flag==True%}
+                {% set token_as_string = ','.join(tokens)%}
+                <div class="query_results">
+                    {% for article_title in titles_by_order %}
+                            <div class="div_article">
+                                <div class="rel_article_tile">
+                                <h3>{{article_title}}</h3>
+                                </div>
+                                <div class="rel_article_info">
+
+                                    <!--div class="m-font-size"><strong >Corpus :</strong>{{corpus_names[article_title]}}</div-->
+                                    <div  class="m-font-size"><strong>Total matches:</strong>{{match_total[article_title]}}</div>
+									<div  class="m-font-size"><strong><a href="{{url_for('tfidf_main',article_title=article_title)}}">Score:</a></strong></div>
+                                    <div class="content_preview">{{abstracts_by_order[loop.index-1]}} ...</div>
+
+                                {%for token in tokens%}
+                                     <span class="badge badge-info my-badge"><span class="token">{{token}}</span>{{token_matches[article_title][token]}}</span>
+                                {% endfor %}
+                                 <br/>
+                                <a class="m-font-size" href="{{url_for('detail_match',article_title=article_title,token_string = token_as_string,token_algorithm=token_algorithm)}}">more...</a>
+                                </div>
+                            </div>
+                    {%endfor%}
+                </div>
+            {%endif%}
+    </div>
+    <div id="page_div">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+			{%if page_idx>1%}
+            <li class="page-item"><a class="page-link" href="#" data-page_idx={{page_idx-1}}>Previous</a></li>
+			{%endif%}
+			{% set token_as_string = ','.join(tokens)%}
+			
+			
+			{%for number in range(1,last_page+1)%}
+				{%if number-page_idx==4%}
+						...
+				{%endif%}
+				{%if (number!=1) and (number!=last_page) and (number-page_idx>3 or number-page_idx<-3)  %}
+			
+					
+				{%elif number==page_idx%}
+					<li class="page-item active"><a class="page-link" href="#" data-page_idx={{number}}>{{number}}</a></li>
+				{%else%}
+					<li class="page-item"><a class="page-link" href="#" data-page_idx={{number}}>{{number}}</a></li>
+				{%endif%}
+				{%if number-page_idx==-4%}
+						...
+				{%endif%}
+			{%endfor%}
+			
+			{%if page_idx<last_page%}
+            <li class="page-item"><a class="page-link" data-page_idx={{page_idx+1}} href="#">Next</a></li>
+			{%endif%}
+          </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+

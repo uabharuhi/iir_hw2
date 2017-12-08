@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+</style>
+{% endblock %}
+{%block real_content %}
+{{article_title}}</br>
+Normal:</br>
+<ul>
+{%for token,tfidf in normal_tfidf%}
+{{token,tfidf}}
+{%endfor%}
+</ul>
+Porter:</br>
+<ul>
+</ul>
+{%endblock%}

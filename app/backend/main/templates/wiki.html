@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<script>
+$(document ).ready(function() {
+    appendPleaseWait() ;
+	$('.submit_btn').on('click',function(){
+        showPleaseWait();
+	});
+});
+</script>
+
+{% endblock %}
+{%block real_content %}
+                <h1>Search A Topic:</h1>
+               <form id="wiki_form" class="form-inline" action="{{url_for('wiki_anayize')}}" method="post" role="form">
+                <!--shttps://stackoverflow.com/questions/21511234/how-to-submit-a-form-on-a-link-click-using-jquery-->
+                   <input id="query"  class="form-control" type="text" name="topic" placeholder="    topic here"/>
+               <button type="submit" class="btn btn-primary submit_btn">Submit</button>
+            </form>
+{%endblock%}
+
+

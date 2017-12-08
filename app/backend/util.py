@@ -234,14 +234,18 @@ def create_corpus_names():
     corpus_category_paths = [os.path.join(root,path) for path in os.listdir(root)]
     print(corpus_category_paths)
     corpus_names = {}
+    # the app/backend/data /*
     for category_path in corpus_category_paths:
         print(category_path)
+        # os.listdir(category_path) :  gene,mutation
         corpus_topic_paths = [os.path.join(category_path,path) for path in os.listdir(category_path)]
+        #os.path.basename(category_path) : pubmed , twitter
         corpus_names[os.path.basename(category_path)] = []
         for  topic_path in  corpus_topic_paths:
             print(topic_path)
             category_name = os.path.basename(category_path)
             topic_name =  os.path.basename(topic_path)
+            # category_names['pubmed']: [pubmed/gene, pubmed/mutation]
             corpus_names[category_name].append(os.path.join(category_name,topic_name))
     corpus_names = corpus_names
     return corpus_names
@@ -258,3 +262,5 @@ def getLookupTables(vocab_list):
             token2id[token] = n
             id2token.append(token)
     return id2token,token2id
+
+

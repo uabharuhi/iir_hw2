@@ -53,6 +53,20 @@
 #page_idx_div{
 	display:none;
 }
+#search_option_div{
+	display:none;
+}
+#tfidf_div{
+	display:none;
+}
+.tf_idf_a_wrapper{
+	margin-top:5px;
+}
+.tf_idf_a_wrapper a{
+	padding:2px 5px 2px 5px;
+	background-color:black;
+	color:white;
+}
 </style>
 <!--這裡的分頁是建立在form上面的像是k_num不變的情況下-->
 <script>
@@ -71,9 +85,24 @@
 	    });
 		$('.page-link').on('click',function()
 		{
-			console.log('1234');
 			$('#page_idx_div input').val($(this).data('page_idx'));
 			$('.submit_btn').click();
+		});
+		$('#search_option').on('click',function(){
+			$('#search_option_div').css('display','block');
+		});
+		$('#rank_model_btn').on('click',function(){
+			var search_option = $('#search_option_select').val();
+			if(search_option=='match'){
+				$('#search_option_div').css('display','none');
+			}else if(search_option=='tfidf'){
+				$('#tfidf_div').css('display','block');
+			}
+			
+		});
+		$('#tfidf_btn').on('click',function(){
+			$('#search_option_div').css('display','none');
+			$('#tfidf_div').css('display','none');
 		});
     });
 
@@ -124,7 +153,60 @@
 								
                <button type="submit" class="btn btn-primary submit_btn">Submit</button>
             </form>
-						
+			<div>
+				<a id="search_option" href="#">Rank option</a> 
+				<div id="search_option_div">
+					<select id="search_option_select" name="rank_model" class="custom-select" form="query_form">
+						{%if rank_model=='match'%}
+						<option value="match" selected="selected">Match</option>
+						{%else%}
+						<option value="match">Match</option>
+						{%endif%}
+						{%if rank_model=='tfidf'%}
+						<option value="tfidf" selected="selected">TF-IDF</option>
+						{%else%}
+						<option value="tfidf">TF-IDF</option>
+						{%endif%}
+					</select>
+					<button id="rank_model_btn" class="btn btn-primary">Select</button>
+					<div id="tfidf_div">
+						TF&nbsp&nbsp
+						<select name="tf_option" class="custom-select" form="query_form">
+							{%if tf_option=='n'%}
+							<option value="n" selected="selected">natural</option>
+							{%else%}
+							<option value="n">natural</option>
+							{%endif%}
+
+							{%if tf_option=='l'%}
+							<option value="l" selected="selected">logarithm</option>
+							{%else%}
+							<option value="l">logarithm</option>
+							{%endif%}
+							{%if tf_option=='a'%}
+							<option value="a" selected="selected">augmented</option>
+							{%else%}
+							<option value="a">augmented</option>
+							{%endif%}					
+						</select>
+						&nbsp&nbsp
+						IDF&nbsp&nbsp
+						<select name="idf_option" class="custom-select" form="query_form">
+							{%if idf_option=='n'%}
+							<option value="n">no</option>
+							{%else%}
+							<option value="n" selected="selected">no</option>
+							{%endif%}
+							{%if idf_option=='n'%}
+							<option value="t">idf</option>
+							{%else%}
+							<option value="t" selected="selected">idf</option>
+							{%endif%}
+						</select>
+						<button id="tfidf_btn" class="btn btn-primary">OK</button>
+					</div>
+				</div>
+			</div>		
             <div id="token_div">
                 {%if alternaive_query|length >0 %}
                 <strong>do you want to search</strong>
@@ -143,6 +225,7 @@
 
                                     <!--div class="m-font-size"><strong >Corpus :</strong>{{corpus_names[article_title]}}</div-->
                                     <div  class="m-font-size"><strong>Total matches:</strong>{{match_total[article_title]}}</div>
+									<div  class="m-font-size"><strong><div class="tf_idf_a_wrapper"><a href="{{url_for('tfidf_main',article_title=article_title)}}">TF-IDF</a></div></strong></div>
                                     <div class="content_preview">{{abstracts_by_order[loop.index-1]}} ...</div>
 
                                 {%for token in tokens%}

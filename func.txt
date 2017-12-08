@@ -1,0 +1,10 @@
+1.Before and After executing Porter
+	-query "cough" ranked by exactly match
+	-pes
+   - choose tf idf
+		 compare log vs augmented diff?
+2.Compare
+	- tf idf different corpus
+	- flu and cough some overlap,but result is not
+
+3.搜尋 cosine sim -->短的 只有一個字很吃香

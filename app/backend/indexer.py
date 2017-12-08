@@ -10,12 +10,11 @@ class Indexer():
 
     def  __build_index(self):
         # key is token , value is list of file path
-        print('indexer')
-        print(self.corpus.name)
+        print('build indexer for %s'%(self.corpus.name))
         self.index_dict = {}
         l = list(self.corpus.vocab)
         paths  = [(path,articles) for path,articles in self.corpus.articles.items()]
-        print('length')
+        print('corpus vocabulary size')
         print(len(l))
         for  i,token in enumerate(l):
             self.index_dict[token] = []

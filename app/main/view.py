@@ -5,8 +5,78 @@ from backend import  util
 from  backend import tokenizer as tk
 import os,sys,inspect
 import _pickle as  pickle
-from backend import util
+from backend import util,score
 
+#@App.route('/query/select')
+#def select_query_sys():
+#    return render_template('query_select.html')
+
+
+
+@App.route('/tfidf_main/<token_algorithm>/<article_title>/<which_tf>/<which_idf>',methods=['POST','GET'])
+def tfidf_compare(token_algorithm,article_title,which_tf,which_idf):
+    top_n = 50
+    ir_sys_compared = None
+    if token_algorithm == 'porter':
+        ir_sys_compared = ir_sys_porter
+    else :
+        ir_sys_compared = ir_sys
+    article,query_article_cpname = ir_sys_compared.findArticleByTitle(article_title)
+    corpus_category_name_dict = ir_sys_compared.corpus_names 
+
+
+    # res corpus name : (most similar article(title,tfidf),least similar article(title,tfidf))
+    res = {}
+    corpusName_tfidfWithTile_dict = {}
+
+    for _,corpus_name_list in corpus_category_name_dict.items():
+        for corpus_name in corpus_name_list:
+            corpus = ir_sys_compared.get_corpus_by_name(corpus_name)
+            title_tfidf_dict = corpus.get_tfidf_of_articles(which_tf=which_tf,which_idf=which_idf)
+
+            if article_title in title_tfidf_dict:
+                title_tfidf_dict.pop(article_title,None)
+
+            items = list(title_tfidf_dict.items())
+            _,tfidf_list = list(zip(*(items)))
+            
+
+            article_tfidf = score.ScoreAlgorithm(corpus.token2id,tf_func=score.get_tf_func(which_tf),
+                idf_func=score.get_idf_func(which_idf)).calculateOneWithIdfData(corpus.idf_dict[which_idf],article.getTokens())
+
+            order_inds = score.cosine_sim_rank(article_tfidf,tfidf_list)
+
+            title_least_sim,least_tfidf = items[ order_inds[0]][0],items[ order_inds[0]][1]
+            title_most_sim,most_tfidf = items[ order_inds[-1]][0],items[ order_inds[-1]][1]
+
+            corpusName_tfidfWithTile_dict[corpus_name] = score.sort_tfidf_of_document(article_tfidf,top_n,corpus.id2token)
+
+            res[corpus_name] = ((title_most_sim,score.sort_tfidf_of_document(most_tfidf,top_n,corpus.id2token)),
+                                (title_least_sim,score.sort_tfidf_of_document(least_tfidf,top_n,corpus.id2token)))
+
+    return render_template('tfidf/compare.html',article_title=article_title , 
+        corpusName_tfidfWithTile_dict = corpusName_tfidfWithTile_dict,res=res,which_tf=which_tf,which_idf=which_idf)
+
+
+# this page of tfidf of porter and not porter when user click article Score hyperlink
+@App.route('/tfidf_main/<article_title>',methods=['POST','GET'])
+def tfidf_main(article_title):
+    which_tf = 'l'
+    which_idf = 't'
+    if request.method == 'POST':
+        which_tf    =  request.form['tf_option']
+        which_idf   =  request.form['idf_option']
+    normal_tfidf = ir_sys.get_tfidf_of_article_all_corpus(article_title,which_tf = which_tf ,which_idf=which_idf)
+    porter_tfidf = ir_sys_porter.get_tfidf_of_article_all_corpus(article_title,which_tf = which_tf,which_idf=which_idf)
+    assert normal_tfidf is not None
+    assert porter_tfidf is not None
+
+    # top_list =[(token1,tfidf1),(token2,tfidf2)...]
+    normal_top_list = score.sort_tfidf_of_document(normal_tfidf,50,ir_sys.id2token)
+    porter_top_list = score.sort_tfidf_of_document(porter_tfidf,50,ir_sys_porter.id2token)
+
+    return render_template('tfidf/main.html',article_title=article_title,normal_tfidf=normal_top_list,porter_tfidf=porter_top_list
+        ,tf_option=which_tf,idf_option=which_idf)
 #a part group is a tuple (token_number,string) #the string is a regular expression group
 @App.route('/detail_match/<article_title>/<token_string>/<token_algorithm>')
 def detail_match(article_title,token_string,token_algorithm):
@@ -18,25 +88,13 @@ def detail_match(article_title,token_string,token_algorithm):
     else:
         assert False
 
-    tokens = token_string.split(",")
-    corupus_list = [ queryer.indexer.corpus for  _,queryer in ir_sys_for_query.queryers.items()]
-    article  = None
-    for corpus in corupus_list:
-        for path,a in corpus.articles.items():
-            if type(a) is list:
-                for  aa in a:
-                    if aa.getTitle() == article_title:
-                        article = aa
-                        break
-            elif a.getTitle() ==  article_title:
-                article = a
-                break
-        if article is not None:
-            break
+  
+    article,_ = ir_sys_for_query.findArticleByTitle(article_title)
 
     if article is None:
         return 'cannot find article'
     #
+    tokens = token_string.split(",")
     if article.getType()=='pubmed':
         title_part_group,abstracts_part_groups =util.find_token_pos_in_pubmed_article(tokens, article)
         print(abstracts_part_groups)
@@ -56,8 +114,18 @@ def detail_match(article_title,token_string,token_algorithm):
 
 @App.route('/query',methods=['POST'])
 def query():
+    #rank_model = req
+    #tf_option
+    #idf_option
     item_per_page = 10
     query = request.form['query']
+    rank_model =  request.form['rank_model']
+    tf_option =  request.form['tf_option']
+    idf_option = request.form['idf_option']
+    print('rank model')
+    print(rank_model)
+    print(tf_option)
+    print(idf_option)
 
     if 'page_idx' in  request.form: 
         page_idx = int(request.form['page_idx'])
@@ -80,9 +148,16 @@ def query():
         assert False
 
 
+    if rank_model == 'match':
+        titles_by_order,abstracts_by_order,corpus_names, match_total, token_matches, tokens =  \
+                    ir_sys_for_query .make_query_order_by_match_total(query,k_num) 
+    elif rank_model == 'tfidf':
+        titles_by_order,abstracts_by_order,corpus_names, match_total, token_matches, tokens =  \
+                    ir_sys_for_query .make_query_order_by_tfidf(query,k_num,which_tf=tf_option,which_idf=idf_option) 
+    else:
+        assert False
 
-    titles_by_order,abstracts_by_order,corpus_names, match_total, token_matches, tokens =   ir_sys_for_query .make_query(query,k_num)
-    total_item_num =  len(titles_by_order) 
+    total_item_num = len(titles_by_order)
 
     tokenizer = tk.SpaceTokenizer()
     alternative_query = ''
@@ -160,8 +235,6 @@ def dist_figure(corpus_category,corpus_name):
 
     corpus = [corpus for corpus in corpus_list if (corpus_category+'\\'+corpus_name)==corpus.name][0]
 
-
-
     save_path_root = './main/static'
 
     articles = util.top_n_relevant_articles(corpus,num)
@@ -229,3 +302,25 @@ def wiki_anayize():
     tops,downs,randoms = list(zip(top_words,top_freqs)),list(zip(down_words,down_freqs)),list(zip(random_words,random_freqs))
     return render_template('wiki_dist.html',text=topic_analyzer.text,topic=topic,tops=tops,downs=downs,randoms=randoms,random_idxs=random_idx)
 
+@App.route('/display_article/<article_title>')
+def display_article(article_title):
+  
+    article,_ = ir_sys.findArticleByTitle(article_title)
+
+    if article is None:
+        return 'cannot find article'
+
+    if article.getType()=='pubmed':
+        return render_template("article/display_pubmed.html", 
+                                title=article_title, 
+                               abstract_list=article.abstract_text)
+    elif article.getType()=='twitter':
+        print('tutti')
+        print(article.text)
+        return render_template("article/display_twitter.html", 
+                                title=article_title, 
+                                content=article.text)
+    else:
+        return 'unknown article type'
+
+    return 'unknown article type....'

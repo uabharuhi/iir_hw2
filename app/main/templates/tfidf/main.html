@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% from "macro.html" import tfidf_table %}
+{% block head %}
+{{super()}}
+<style>
+.right-space{
+	margin-right:20px;
+}
+#tfidf-form-wrapper{
+	margin-top:30px;
+	margin-bottom:30px;
+}
+.article_title_wrapper{
+	margin-top:10px;
+	margin-bottom:
+}
+.tokenize_method{
+	margin-top:20px;
+	margin-bottom:20px;
+}
+.compare_div{
+	margin-top:20px;
+	margin-bottom:10px;
+}
+.compare_div a{
+	padding:10px 10px 10px 10px;
+	background-color:#007bff;
+	color:white;
+}
+</style>
+<script>
+ $(document).ready(function(){
+	/*
+	$('.compare_div a').on('click',function(){
+		console.log('1234567');
+		appendPleaseWait();
+	})
+	*/
+        //appendPleaseWait();
+		
+    });
+</script>
+{% endblock %}
+{%block real_content %}
+<div id="tfidf-form-wrapper">
+	
+	<form id="tfidf_form" class="form-inline" action="{{url_for('tfidf_main',article_title=article_title)}}" method="post" role="form">
+	<!--https://stackoverflow.com/questions/21511234/how-to-submit-a-form-on-a-link-click-using-jquery-->
+					<span class="right-space">
+					TF
+					</span>
+					<span class="right-space">
+					<select name="tf_option" class="custom-select">
+						{%if tf_option=='n'%}
+						<option value="n" selected="selected">natural</option>
+						{%else%}
+						<option value="n">natural</option>
+						{%endif%}
+
+						{%if tf_option=='l'%}
+						<option value="l" selected="selected">logarithm</option>
+						{%else%}
+						<option value="l">logarithm</option>
+						{%endif%}
+						{%if tf_option=='a'%}
+						<option value="a" selected="selected">augmented</option>
+						{%else%}
+						<option value="a">augmented</option>
+						{%endif%}					
+					</select>
+					</span>
+					<span class="right-space">
+					IDF
+					</span>
+					<span class="right-space">
+						<select name="idf_option" class="custom-select">
+							{%if idf_option=='n'%}
+							<option value="n">no</option>
+							{%else%}
+							<option value="n" selected="selected">no</option>
+							{%endif%}
+							{%if idf_option=='n'%}
+							<option value="t">idf</option>
+							{%else%}
+							<option value="t" selected="selected">idf</option>
+							{%endif%}
+						</select>
+					</span>
+					<span class="right-space">
+						<button type="submit" class="btn btn-primary submit_btn">Submit</button>
+					</span>
+	</form>
+</div>
+<div>
+<div class="article_title_wrapper"><h2><a href="{{url_for('display_article',article_title=article_title)}}">{{article_title}}</a></h2></div>
+<div class="tokenize_method"><h3>Normal:</h3></div>
+{{tfidf_table(normal_tfidf)}}
+<div class="compare_div">
+<a href="{{url_for('tfidf_compare',token_algorithm='normal',article_title=article_title,which_tf=tf_option,which_idf=idf_option)}}">Compare</a></br>
+</div>
+</div>
+<div>
+<div class="tokenize_method"><h3>Porter:</h3></div>
+{{tfidf_table(porter_tfidf)}}
+<div class="compare_div">
+<a href="{{url_for('tfidf_compare',token_algorithm='porter',article_title=article_title,which_tf=tf_option,which_idf=idf_option)}}">Compare</a>
+</div>
+</div>
+{%endblock%}

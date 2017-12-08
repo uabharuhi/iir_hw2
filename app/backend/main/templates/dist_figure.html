@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<style>
+.wf-table_wrapper{
+	width:50%;
+}
+.wf-table_wrapper> div{
+	margin-top:50px;
+}
+.wf-table_wrapper table{
+	margin-top:50px;
+}
+</style>
+{% endblock %}
+{%block real_content %}
+            <h1>Distributions of {{corpus_name}} in {{corpus_category}}</h1>
+            <div class="wf-table_wrapper">
+                <div>
+                    <h3>Normal</h3>
+                    <img src="{{url_for('static',filename='%s.png'%(filename_prefix))}}"/>
+                                <!-- top_words[0] for non tokenize -->
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>top words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in tops[0]%}
+										 <tr><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>rare words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in downs[0]%}
+										 <tr><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>#</th><th>sample words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in randoms[0]%}
+										 <tr><td><strong>{{random_idxs[0][loop.index-1]}}</strong></td><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+
+                </div>
+				<div>
+                    <h3>Porter</h3>
+                    <img src="{{url_for('static',filename='%s_porter.png'%(filename_prefix))}}"/>
+                                <!-- top_words[0] for non tokenize -->
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>top words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in tops[1]%}
+										 <tr><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>rare words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in downs[1]%}
+										 <tr><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+                                <table class="table">
+									<thead class="thead-dark">
+										<tr><th>#</th><th>sample words</th><th>freq</th></tr>
+									</thead>
+									<tbody>
+										{%for word,freq in randoms[1]%}
+										 <tr><td><strong>{{random_idxs[1][loop.index-1]}}</strong></td><td>{{word}}</td><td>{{freq}}</td></tr>
+										{%endfor%}
+									</tbody>
+                                </table>
+
+                </div>
+            </div>
+{%endblock%}
+
+

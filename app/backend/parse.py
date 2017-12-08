@@ -11,7 +11,9 @@ class ParserFactory():
       for article_json in l:
         article = TwitterArticle()
         article.init_by_json(article_json)
-        articles.append(article)
+        
+        if not article.isEmpty():
+          articles.append(article)
       return articles
 
     def parsePubmedJson(text):

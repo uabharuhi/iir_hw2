@@ -5,3 +5,23 @@ python尋找module順序
 4. 自己裝的library
 
 set PYTHONPATH=C:\Users\IIR\Desktop\一上\IR\hw2\app
+
+
+tf-idf vocabulary: all word appear in 
+
+search --> all articles --> select one article(analyze function) --> porter and not porter tf idf (first k words)--> select porter or  not porter
+--> each corpuscategory\topic select first near and last near
+
+
+-->user choose tf-idf to use 
+tf 
+	tf
+	1+log(tf)
+	0.5+(0.5*tf/max_tf)
+idf 
+	1
+	log(N/df)
+--> corpus --> save idf
+--> ir sys --> save idf 
+
+--> each vocab --> save idf

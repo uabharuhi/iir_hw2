@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<style>
+    .corpus_overview{
+        margin-top:20px;
+    }
+    .corpus_overview ul{
+        list-style-type: none;
+    }
+    .corpus_overview h4{
+       font-size:36px;
+        color:darkslategray;
+    }
+    .corpus_overview li{
+        font-size:24px;
+    }
+	.cpname+form{
+		display:none;
+	}
+</style>
+<script>
+$(document ).ready(function() {
+    appendPleaseWait() ;
+	//var tmp_href = '';
+	$('.cpname').on('click',function(){
+		form = $(this).next();
+		console.log(form);
+		if(form.css('display')=='none'){
+			form.css('display','inline-block');
+		}else{
+			form.css('display','none');
+		}
+	});
+
+	$('.submit_btn').on('click',function(){
+        showPleaseWait();
+	});
+});
+</script>
+{% endblock %}
+{%block real_content %}
+     <h1>List of Corpus:</h1>
+ <div class="row">
+    <ul>
+       {% for key, list_of_names in corpus_names.items() %}
+            <div class="corpus_overview">
+            <h4>{{key}}</h4>
+            <ul>
+                {% for name in list_of_names %}
+				<div>
+				<li class="cpname"><a href="#">{{name}}</a></li>
+				<form class="form-inline" method="POST" role="form" action="{{url_for('dist_figure',corpus_category=key,corpus_name=name)}}">
+					<label class="sr-only">Number</label>
+					<input type="text" name="num" class="form-control mb-2 mr-sm-2 mb-sm-0" placeholder="number">
+					<!--input type="submit"/-->
+					<button type="submit" class="btn btn-primary submit_btn">Submit</button>
+				</form>
+				</div>
+                <!--li><a class="cpname" href="{{url_for('dist_figure',corpus_category=key,corpus_name=name,num=300)}}">{{name}}</a></li-->
+                {% endfor %}
+            </ul>
+            </div>
+       {% endfor %}
+    </ul>
+ </div>
+{% endblock %}

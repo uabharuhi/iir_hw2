@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{%block head%}
+{{super()}}
+<style>
+.occur{
+
+}
+.token{
+	text-decoration:none!important;
+}
+.highlight{
+	background:#007bff;
+	color:white;
+	padding:0px 2px 2px 2px;
+}
+</style>
+<script>
+
+	$(document).ready(function()
+	{
+
+
+        $('.token').hover(
+		function(e)
+		{
+
+			var token_num = $(this).data('token_num');
+			console.log('1234');
+			console.log(token_num);
+            $('.occur').each(function(index){
+					if($(this).data('token_num')==token_num){
+						$(this).addClass('highlight');
+					}
+				}
+			);
+
+		},
+		function(e)
+		{
+            $('.occur').each(
+				function(index){
+					$(this).removeClass('highlight');
+				}
+			);
+		}
+		);
+
+	}
+	);
+</script>
+{%endblock%}
+{%block real_content%}
+	<div>
+		<div>
+            <h1>{{title}}</h1>
+		</div>
+		<div>
+		<ul>
+		{%for token in tokens%}
+			<li><a class="token" href="#" data-token_num="{{loop.index-1}}">{{token}}</a></li>
+		{%endfor%}
+		</ul>
+		</div>
+		<div>
+
+
+                <p>
+                    {%for token_num,part in text_part_groups%}
+                    {% if token_num==-1 %}
+                        {{part}}
+                    {% else %}
+                        <span  class="occur" data-token_num="{{token_num}}">{{part}}</span>
+                    {%endif%}
+                    {%endfor%}
+                </p>
+
+
+		</div>
+     </div>
+
+	<!--script src="js/vendor/jquery.js"></script-->
+{% endblock %}
+
+
